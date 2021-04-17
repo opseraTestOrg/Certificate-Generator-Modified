@@ -1,0 +1,44 @@
+logging:
+  file: certificateGenerator
+  path: /apps/OpsERA/logs/components/certificate-generator
+server:
+  port: 8055
+spring:
+  application:
+    name: certificate-generator
+    description: Service to monitor and alert
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+
+---
+
+spring:
+  profiles: freetrial
+pipeline:
+  config:
+    baseurl: https://freetrial-microservice.opsera.io/api/pipeline
+customer:
+  config:
+    baseurl: https://freetrial-microservice.opsera.io/api/customer
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: https://freetrial-microservice.opsera.io:8761/eureka/
+
+---
+
+spring:
+  profiles: kubernetes
+pipeline:
+  config:
+    baseurl: http://opsera-apigateway.microservices.svc.cluster.local:9091/api/pipeline
+vault:
+  config:
+    baseurl: http://opsera-apigateway.microservices.svc.cluster.local:9091/api/vault
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://opsera-service-discovery.microservices.svc.cluster.local:8761/eureka/
+
