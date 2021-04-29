@@ -36,16 +36,27 @@ public class CertificateHelper {
      * @throws OperatorCreationException
      */
     public X509Certificate generateCertificate(KeyPair keyPair) {
-        try {
             X500Name name = new X500Name("cn=Annoying Wrapper");
+            final Date until = Date.from(LocalDate.now().plus(3650, ChronoUnit.DAYS).atStartOfDay().toInstant(ZoneOffset.UTC));
+            return generateCertificate(keyPair, name, until);
+    }
+
+    /**
+     *
+     * @param keyPair
+     * @return
+     * @throws CertificateException
+     * @throws OperatorCreationException
+     */
+    public X509Certificate generateCertificate(KeyPair keyPair, X500Name x500Name, Date until) {
+        try {
             SubjectPublicKeyInfo subPubKeyInfo = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
             final Date start = new Date();
-            final Date until = Date.from(LocalDate.now().plus(3650, ChronoUnit.DAYS).atStartOfDay().toInstant(ZoneOffset.UTC));
-            final X509v3CertificateBuilder builder = new X509v3CertificateBuilder(name,
+            final X509v3CertificateBuilder builder = new X509v3CertificateBuilder(x500Name,
                     new BigInteger(10, new SecureRandom()),
                     start,
                     until,
-                    name,
+                    x500Name,
                     subPubKeyInfo
             );
             ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").setProvider(new BouncyCastleProvider()).build(keyPair.getPrivate());

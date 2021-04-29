@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 @Data
-public class ToolRegistryRecord {
-    @JsonAlias("_id")
+public class ConfigRecord {
+    @JsonAlias({"_id", "taskIs"})
     private String id;
     private String owner;
-    private ToolConfiguration configuration;
+    private Configuration configuration;
 }

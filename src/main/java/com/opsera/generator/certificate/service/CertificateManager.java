@@ -3,7 +3,10 @@ package com.opsera.generator.certificate.service;
 import com.opsera.generator.certificate.config.AppConfig;
 import com.opsera.generator.certificate.config.IServiceFactory;
 import com.opsera.generator.certificate.exception.InternalServiceException;
-import com.opsera.generator.certificate.resource.ToolRegistryRecord;
+import com.opsera.generator.certificate.resource.CertificateCreationRequest;
+import com.opsera.generator.certificate.resource.Configuration;
+import com.opsera.generator.certificate.resource.ConfigRecord;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.util.io.pem.PemObjectGenerator;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -38,32 +41,34 @@ public class CertificateManager {
     }
 
     public String getPrivateKey(String toolId, String customerId) {
-        ToolRegistryRecord toolRegistryRecord = serviceFactory.getConfigurationOrchestrator().getToolConfig(toolId, customerId);
-        String privateKey = toolRegistryRecord.getId() + "-privateKey";
-        return serviceFactory.getVaultOrchestrator().readSecret(toolRegistryRecord.getOwner(), privateKey);
+        ConfigRecord configRecord = serviceFactory.getConfigurationOrchestrator().getTaskConfig(toolId, customerId);
+        String privateKey = configRecord.getId() + "-privateKey";
+        return serviceFactory.getVaultOrchestrator().readSecret(configRecord.getOwner(), privateKey);
     }
 
-    public String getCertificate(String toolId, String customerId) {
-        ToolRegistryRecord toolRegistryRecord = serviceFactory.getConfigurationOrchestrator().getToolConfig(toolId, customerId);
-        String certKey = toolRegistryRecord.getId() + "-certKey";
-        return serviceFactory.getVaultOrchestrator().readSecret(toolRegistryRecord.getOwner(), certKey);
+    public String getCertificate(String taskId, String customerId) {
+        ConfigRecord configRecord = serviceFactory.getConfigurationOrchestrator().getTaskConfig(taskId, customerId);
+        String certKey = configRecord.getId() + "-certKey";
+        return serviceFactory.getVaultOrchestrator().readSecret(configRecord.getOwner(), certKey);
     }
 
-    public void generateAndStore(String toolId, String customerId) {
-        ToolRegistryRecord toolRegistryRecord = serviceFactory.getConfigurationOrchestrator().getToolConfig(toolId, customerId);
+    public void generateAndStore(CertificateCreationRequest request) {
+        ConfigRecord configRecord = serviceFactory.getConfigurationOrchestrator().getTaskConfig(request.getTaskId(), request.getCustomerId());
         KeyPair keyPair = serviceFactory.getCertificateHelper().generateRSAKeyPair();
-        X509Certificate certificate = serviceFactory.getCertificateHelper().generateCertificate(keyPair);
+        X500Name name = getX500Name(configRecord.getConfiguration());
+        X509Certificate certificate = serviceFactory.getCertificateHelper().generateCertificate(
+                keyPair, name, configRecord.getConfiguration().getExpiryDate());
 
         String encodedPrivateKey = Base64.getEncoder().encodeToString(getPEMContent(keyPair.getPrivate()));
         String encodedCertificate = Base64.getEncoder().encodeToString(getPEMContent(certificate));
 
         Map<String, String> vaultSecrets = new HashMap<>();
-        String privateKey = toolRegistryRecord.getId() + "-privateKey";
-        String certKey = toolRegistryRecord.getId() + "-certKey";
+        String privateKey = configRecord.getId() + "-privateKey";
+        String certKey = configRecord.getId() + "-certKey";
         vaultSecrets.put(privateKey, encodedPrivateKey);
         vaultSecrets.put(certKey, encodedCertificate);
 
-        serviceFactory.getVaultOrchestrator().writeSecrets(customerId, vaultSecrets);
+        serviceFactory.getVaultOrchestrator().writeSecrets(configRecord.getOwner(), vaultSecrets);
     }
 
     public byte[] getPEMContent(Object object) {
@@ -75,6 +80,17 @@ public class CertificateManager {
             throw new InternalServiceException("Unable to encode");
         }
         return sw.toString().getBytes();
+    }
+
+    public X500Name getX500Name(Configuration configuration) {
+        return new X500Name(String.format("C=%s, ST=%s, L=%s, O=%s, OU=%s, CN=%s/emailAddress=%s",
+                configuration.getCountryName(),
+                configuration.getState(),
+                configuration.getLocality(),
+                configuration.getOrganization(),
+                configuration.getUnitName(),
+                configuration.getCommonName(),
+                configuration.getEmail()));
     }
 
 }

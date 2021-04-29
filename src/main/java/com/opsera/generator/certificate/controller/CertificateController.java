@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 
 import static com.opsera.generator.certificate.resource.Constants.FILE_NAME_TEMPLATE;
 
@@ -92,7 +93,7 @@ public class CertificateController {
             MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE
     })
     public ResponseEntity<String> generateAndStore(@RequestBody CertificateCreationRequest request) {
-        serviceFactory.getCertificateManager().generateAndStore(request.getToolId(), request.getCustomerId());
+        serviceFactory.getCertificateManager().generateAndStore(request);
         return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
     }
 
@@ -102,14 +103,11 @@ public class CertificateController {
      * @return
      * @throws Exception
      */
-    @GetMapping(path = "get/certificate", produces = {
-            MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE
-    })
-    public ResponseEntity<byte[]> getCertificate(@RequestParam String toolId, @RequestParam String customerId) {
-        String certificatePEM =  serviceFactory.getCertificateManager().getCertificate(toolId, customerId);
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s.crt", toolId));
-        return new ResponseEntity<>(certificatePEM.getBytes(), headers, HttpStatus.OK);
+    @GetMapping(path = "get/certificate")
+    public ResponseEntity<String> getCertificate(@RequestParam String taskId, @RequestParam String customerId) {
+        String certificatePEM =  serviceFactory.getCertificateManager().getCertificate(taskId, customerId);
+        String encodedCertificatePEM = Base64.getEncoder().encodeToString(certificatePEM.getBytes());
+        return new ResponseEntity<>(encodedCertificatePEM, HttpStatus.OK);
     }
 
     /**
@@ -118,14 +116,11 @@ public class CertificateController {
      * @return
      * @throws Exception
      */
-    @GetMapping(path = "/get/privateKey", produces = {
-            MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE
-    })
-    public ResponseEntity<byte[]> getPrivateKey(@RequestParam String toolId, @RequestParam String customerId) {
-        String privateKeyPEM = serviceFactory.getCertificateManager().getPrivateKey(toolId, customerId);
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s.key", toolId));
-        return new ResponseEntity<>(privateKeyPEM.getBytes(), headers, HttpStatus.OK);
+    @GetMapping(path = "/get/privateKey")
+    public ResponseEntity<String> getPrivateKey(@RequestParam String taskId, @RequestParam String customerId) {
+        String privateKeyPEM = serviceFactory.getCertificateManager().getPrivateKey(taskId, customerId);
+        String encodedPrivateKeyPEM = Base64.getEncoder().encodeToString(privateKeyPEM.getBytes());
+        return new ResponseEntity<>(encodedPrivateKeyPEM, HttpStatus.OK);
     }
 }
 

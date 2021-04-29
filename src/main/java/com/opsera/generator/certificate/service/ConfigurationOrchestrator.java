@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.opsera.generator.certificate.config.AppConfig;
 import com.opsera.generator.certificate.config.IServiceFactory;
 import com.opsera.generator.certificate.exception.InternalServiceException;
-import com.opsera.generator.certificate.resource.ToolRegistryRecord;
+import com.opsera.generator.certificate.resource.ConfigRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +22,14 @@ public class ConfigurationOrchestrator {
 
     /**
      *
-     * @param toolId
+     * @param taskId
      * @param customerId
      * @return
      */
-    public ToolRegistryRecord getToolConfig(String toolId, String customerId) {
+    public ConfigRecord getTaskConfig(String taskId, String customerId) {
         try {
-            ResponseEntity<String> responseEntity = serviceFactory.getConfigHelper().getToolConfig(toolId, customerId);
-            return serviceFactory.getObjectMapper().readValue(responseEntity.getBody(), ToolRegistryRecord.class);
+            ResponseEntity<String> responseEntity = serviceFactory.getConfigHelper().getTaskConfig(taskId, customerId);
+            return serviceFactory.getObjectMapper().readValue(responseEntity.getBody(), ConfigRecord.class);
         } catch (JsonProcessingException e) {
             LOGGER.info("ConfigurationOrchestrator.getToolConfig.exception");
             throw new InternalServiceException(String.format("Error while parsing response from " +
