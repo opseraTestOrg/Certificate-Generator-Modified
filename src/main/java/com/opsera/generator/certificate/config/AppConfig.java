@@ -15,6 +15,9 @@ public class AppConfig {
     @Value("${pipeline.config.baseurl}")
     private String pipelineConfigBaseUrl;
 
+    @Value("${kafka.config.baseurl}")
+    private String kafkaConfigBaseUrl;
+
     @Value("${vault.config.baseurl}")
     private String vaultBaseUrl;
 

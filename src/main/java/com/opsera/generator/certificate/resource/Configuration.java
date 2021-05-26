@@ -2,7 +2,6 @@ package com.opsera.generator.certificate.resource;
 
 import lombok.Data;
 
-import java.util.Date;
 
 @Data
 public class Configuration {
@@ -21,5 +20,5 @@ public class Configuration {
 
     private String email;
 
-    private Date expiryDate;
+    private String expiryDate;
 }

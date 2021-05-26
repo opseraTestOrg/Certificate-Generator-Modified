@@ -4,8 +4,8 @@ import com.opsera.generator.certificate.config.AppConfig;
 import com.opsera.generator.certificate.config.IServiceFactory;
 import com.opsera.generator.certificate.exception.InternalServiceException;
 import com.opsera.generator.certificate.resource.CertificateCreationRequest;
-import com.opsera.generator.certificate.resource.Configuration;
 import com.opsera.generator.certificate.resource.ConfigRecord;
+import com.opsera.generator.certificate.resource.Configuration;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.util.io.pem.PemObjectGenerator;
@@ -17,7 +17,10 @@ import java.io.StringWriter;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,8 +59,10 @@ public class CertificateManager {
         ConfigRecord configRecord = serviceFactory.getConfigurationOrchestrator().getTaskConfig(request.getTaskId(), request.getCustomerId());
         KeyPair keyPair = serviceFactory.getCertificateHelper().generateRSAKeyPair();
         X500Name name = getX500Name(configRecord.getConfiguration());
+
+        Instant instant = Instant.parse (configRecord.getConfiguration().getExpiryDate());
         X509Certificate certificate = serviceFactory.getCertificateHelper().generateCertificate(
-                keyPair, name, configRecord.getConfiguration().getExpiryDate());
+                keyPair, name, Date.from(instant));
 
         String encodedPrivateKey = Base64.getEncoder().encodeToString(getPEMContent(keyPair.getPrivate()));
         String encodedCertificate = Base64.getEncoder().encodeToString(getPEMContent(certificate));
@@ -91,6 +96,11 @@ public class CertificateManager {
                 configuration.getUnitName(),
                 configuration.getCommonName(),
                 configuration.getEmail()));
+    }
+
+    public void uploadCertificate(CertificateCreationRequest request) {
+        String encodedCertificate = getCertificate(request.getTaskId(), request.getCustomerId());
+        // call jenkins service to upload the cert via kafka
     }
 
 }

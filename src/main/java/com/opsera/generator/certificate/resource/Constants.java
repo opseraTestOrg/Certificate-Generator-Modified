@@ -9,5 +9,6 @@ public class Constants {
     public static final String QUERY_PARM_TASKID = "taskId";
     public static final String QUERY_PARM_CUSTOMERID = "customerId";
     public static final String TASK_CONFIG_ENDPOINT = "/gittask/record";
+    public static final String PUBLISH_MESSAGES_ENDPOINT = "/publish/messages";
     public static final String FILE_NAME_TEMPLATE = "attachment; filename=%s";
 }

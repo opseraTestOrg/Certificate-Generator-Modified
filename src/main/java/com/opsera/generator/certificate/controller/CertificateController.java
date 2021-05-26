@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Base64;
+import java.util.Date;
 
 import static com.opsera.generator.certificate.resource.Constants.FILE_NAME_TEMPLATE;
 
@@ -45,42 +47,6 @@ public class CertificateController {
     @ApiOperation("To check the service status")
     public String status() {
         return "Service is running";
-    }
-
-    /**
-     *
-     *
-     * @return
-     * @throws Exception
-     */
-    @GetMapping(path = "generate/certificate", produces = {
-            MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE
-    })
-    public ResponseEntity<byte[]> generateCertificate() {
-        X509Certificate certificate =  serviceFactory.getCertificateManager().generateCertificate();
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format(FILE_NAME_TEMPLATE, "server.crt"));
-
-        byte[] response = serviceFactory.getCertificateManager().getPEMContent(certificate);
-        return new ResponseEntity<>(response, headers, HttpStatus.OK);
-    }
-
-    /**
-     *
-     *
-     * @return
-     * @throws Exception
-     */
-    @GetMapping(path = "/generate/privateKey", produces = {
-            MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE, MediaType.TEXT_PLAIN_VALUE
-    })
-    public ResponseEntity<byte[]> generatePrivateKey() {
-        PrivateKey privateKey = serviceFactory.getCertificateManager().generatePrivateKey();
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format(FILE_NAME_TEMPLATE, "private.key"));
-
-        byte[] response = serviceFactory.getCertificateManager().getPEMContent(privateKey);
-        return new ResponseEntity<>(response, headers, HttpStatus.OK);
     }
 
     /**

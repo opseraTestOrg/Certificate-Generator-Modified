@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.opsera.generator.certificate.helper.CertificateHelper;
 import com.opsera.generator.certificate.helper.ConfigHelper;
+import com.opsera.generator.certificate.helper.KafkaHelper;
 import com.opsera.generator.certificate.helper.VaultHelper;
 import com.opsera.generator.certificate.service.CertificateManager;
 import com.opsera.generator.certificate.service.ConfigurationOrchestrator;
@@ -19,5 +20,6 @@ public interface IServiceFactory {
     Gson gson();
     CertificateManager getCertificateManager();
     CertificateHelper getCertificateHelper();
+    KafkaHelper getKafkaHelper();
     RestTemplate getRestTemplate();
 }
