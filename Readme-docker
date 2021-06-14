@@ -1,0 +1,13 @@
+#build dev image
+
+docker build -t 440953937617.dkr.ecr.us-east-2.amazonaws.com/opsera-certificate-generator:dev .
+docker run -p 8055:8055 --name opsera-certificate-generator --env DOCKER_ENV=dev -v /apps/OpsERA/logs/components/certificate-generator:/apps/OpsERA/logs/components/certificate-generator --restart=always -d 440953937617.dkr.ecr.us-east-2.amazonaws.com/opsera-certificate-generator:dev
+docker stop opsera-certificate-generator
+docker rm opsera-certificate-generator
+
+#build test image
+
+docker build -t 440953937617.dkr.ecr.us-east-2.amazonaws.com/opsera-certificate-generator:test .
+docker run -p 8055:8055 --name opsera-certificate-generator --env DOCKER_ENV=test -v /apps/OpsERA/logs/components/certificate-generator:/apps/OpsERA/logs/components/certificate-generator --restart=always -d 440953937617.dkr.ecr.us-east-2.amazonaws.com/opsera-certificate-generator:test
+docker stop opsera-certificate-generator
+docker rm opsera-certificate-generator
