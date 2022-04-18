@@ -1,6 +1,16 @@
 package com.opsera.generator.certificate.helper;
 
-import com.opsera.generator.certificate.exception.InternalServiceException;
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -14,16 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import com.opsera.core.exception.ServiceException;
+
 
 @Component
 public class CertificateHelper {
@@ -64,7 +66,7 @@ public class CertificateHelper {
             return new JcaX509CertificateConverter().setProvider(new BouncyCastleProvider()).getCertificate(holder);
         } catch (Exception e) {
             LOGGER.info("CertificateHelper.generateCertificate.exception");
-            throw new InternalServiceException(String.format("Exception @ cert generation. Details: [%s: %s]", e.getClass().getSimpleName(), e.getMessage()));
+            throw new ServiceException(String.format("Exception @ cert generation. Details: [%s: %s]", e.getClass().getSimpleName(), e.getMessage()));
         }
     }
 
@@ -80,7 +82,7 @@ public class CertificateHelper {
             return kpGen.generateKeyPair();
         } catch (Exception e) {
             LOGGER.info("CertificateHelper.generateRSAKeyPair.exception");
-            throw new InternalServiceException(String.format("Exception @ key generation. Details: [%s: %s]", e.getClass().getSimpleName(), e.getMessage()));
+            throw new ServiceException(String.format("Exception @ key generation. Details: [%s: %s]", e.getClass().getSimpleName(), e.getMessage()));
         }
     }
 }

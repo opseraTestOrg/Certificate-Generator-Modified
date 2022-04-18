@@ -1,9 +1,7 @@
 package com.opsera.generator.certificate.helper;
 
-import com.opsera.generator.certificate.config.AppConfig;
-import com.opsera.generator.certificate.config.IServiceFactory;
-import com.opsera.generator.certificate.exception.DependantServiceException;
-import com.opsera.generator.certificate.resource.PipelineConfigRequest;
+import static com.opsera.generator.certificate.resource.Constants.TASK_CONFIG_ENDPOINT;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import static com.opsera.generator.certificate.resource.Constants.TASK_CONFIG_ENDPOINT;
+import com.opsera.core.exception.ServiceException;
+import com.opsera.generator.certificate.config.AppConfig;
+import com.opsera.generator.certificate.config.IServiceFactory;
+import com.opsera.generator.certificate.resource.PipelineConfigRequest;
 
 @Component
 public class ConfigHelper {
@@ -39,7 +40,7 @@ public class ConfigHelper {
             return restTemplate.postForEntity(appConfig.getPipelineConfigBaseUrl() + TASK_CONFIG_ENDPOINT, request, String.class);
         } catch (Exception e) {
             LOGGER.info("ConfigHelper.getTaskConfig.exception");
-            throw new DependantServiceException(String.format("Exception @ config retrival. Details [%s: %s]", e.getClass().getSimpleName(), e.getMessage()));
+            throw new ServiceException(String.format("Exception @ config retrival. Details [%s: %s]", e.getClass().getSimpleName(), e.getMessage()));
         }
     }
 

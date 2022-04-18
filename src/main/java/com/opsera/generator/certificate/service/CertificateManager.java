@@ -1,11 +1,15 @@
 package com.opsera.generator.certificate.service;
 
-import com.opsera.generator.certificate.config.AppConfig;
-import com.opsera.generator.certificate.config.IServiceFactory;
-import com.opsera.generator.certificate.exception.InternalServiceException;
-import com.opsera.generator.certificate.resource.CertificateCreationRequest;
-import com.opsera.generator.certificate.resource.ConfigRecord;
-import com.opsera.generator.certificate.resource.Configuration;
+import java.io.StringWriter;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
 import org.bouncycastle.util.io.pem.PemObjectGenerator;
@@ -13,25 +17,17 @@ import org.bouncycastle.util.io.pem.PemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.StringWriter;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.time.Instant;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import com.opsera.core.exception.ServiceException;
+import com.opsera.generator.certificate.config.IServiceFactory;
+import com.opsera.generator.certificate.resource.CertificateCreationRequest;
+import com.opsera.generator.certificate.resource.ConfigRecord;
+import com.opsera.generator.certificate.resource.Configuration;
 
 @Component
 public class CertificateManager {
 
     @Autowired
     private IServiceFactory serviceFactory;
-
-    @Autowired
-    private AppConfig appConfig;
 
     public X509Certificate generateCertificate() {
         KeyPair keyPair = serviceFactory.getCertificateHelper().generateRSAKeyPair();
@@ -82,7 +78,7 @@ public class CertificateManager {
             PemObjectGenerator gen = new JcaMiscPEMGenerator(object);
             pw.writeObject(gen);
         } catch (Exception e) {
-            throw new InternalServiceException("Unable to encode");
+            throw new ServiceException("Unable to encode");
         }
         return sw.toString().getBytes();
     }
