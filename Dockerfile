@@ -8,4 +8,4 @@ FROM openjdk:8-jre-slim
 RUN mkdir /app
 COPY --from=build /home/gradle/src/build/libs/*.jar /apps/OpsERA/components/certificate-generator/certificate-generator.jar
 EXPOSE 8055
-ENTRYPOINT java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dspring.profiles.active=$DOCKER_ENV -Djava.security.egd=file:/dev/./urandom -jar /apps/OpsERA/components/certificate-generator/certificate-generator.jar
+ENTRYPOINT java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dspring.profiles.active=$DOCKER_ENV $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /apps/OpsERA/components/certificate-generator/certificate-generator.jar
