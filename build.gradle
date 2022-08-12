@@ -7,7 +7,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.5.RELEASE")
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:2.7.2")
 		classpath('org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.8.0.1969')
 	}
 }
@@ -25,30 +25,34 @@ apply plugin: 'org.sonarqube'
 jar {
 	baseName = projectName
 	version = projectVersion
+	enabled = false
 }
 
 archivesBaseName = projectName
 version = projectVersion
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
 
 repositories {
 	mavenCentral()
 	jcenter()
 }
 
+ext['log4j2.version'] = '2.17.1'
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.apache.httpcomponents:httpclient:4.5.12')
-	compile('io.springfox:springfox-swagger-ui:2.9.2')
+	compile('io.springfox:springfox-swagger-ui:2.10.0')
 	compile('io.springfox:springfox-swagger2:2.9.2')
-	compile('com.google.code.gson:gson:2.8.6')
+	compile('com.google.code.gson:gson:2.9.0')
 	compileOnly 'org.projectlombok:lombok:1.18.4'
-	implementation 'org.springframework.kafka:spring-kafka:2.4.5.RELEASE'
-	implementation('com.hazelcast:hazelcast-all:4.0.2')
+	implementation 'org.springframework.kafka:spring-kafka:2.9.0'
+	implementation('com.hazelcast:hazelcast-all:5.0-BETA-1')
 	implementation('org.bouncycastle:bcpkix-jdk15on:1.58')
 	annotationProcessor 'org.projectlombok:lombok'
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+	implementation 'junit:junit:4.13.1'
 }

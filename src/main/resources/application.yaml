@@ -7,6 +7,9 @@ spring:
   application:
     name: certificate-generator
     description: Service to monitor and alert
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 pipeline:
   config:
     baseurl: ${opsera.config.baseurl}/api/pipeline
