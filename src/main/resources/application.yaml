@@ -13,12 +13,6 @@ spring:
 pipeline:
   config:
     baseurl: ${opsera.config.baseurl}/api/pipeline
-kafka:
-  config:
-    baseurl: ${opsera.config.baseurl}/api/pipeline
-vault:
-  config:
-    baseurl: ${opsera.config.baseurl}/api/vault
 
 ---
 
